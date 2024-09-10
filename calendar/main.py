@@ -15,7 +15,7 @@ SCOPES = ['https://www.googleapis.com/auth/calendar']
 
 # Function to get credentials from environment variable
 def get_credentials():
-    credentials_json = os.getenv('calcreds')
+    credentials_json = os.getenv('GOOGLE_CREDENTIALS')
     if credentials_json is None:
         raise HTTPException(status_code=500, detail="Google OAuth credentials not found in environment variables.")
     
@@ -25,14 +25,17 @@ def get_credentials():
     # Check if token.pkl exists
     token_path = 'token.pkl'
     if os.path.exists(token_path):
-        credentials = pickle.load(open(token_path, 'rb'))
+        with open(token_path, 'rb') as token_file:
+            credentials = pickle.load(token_file)
     else:
         credentials = flow.run_local_server(port=0)
-        pickle.dump(credentials, open(token_path, 'wb'))
+        with open(token_path, 'wb') as token_file:
+            pickle.dump(credentials, token_file)
 
     if credentials and credentials.expired and credentials.refresh_token:
         credentials.refresh(Request())
-        pickle.dump(credentials, open(token_path, 'wb'))
+        with open(token_path, 'wb') as token_file:
+            pickle.dump(credentials, token_file)
 
     return credentials
 
