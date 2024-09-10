@@ -1,18 +1,11 @@
-
 FROM python:3.9
-WORKDIR /app
-
-# Copy the current directory contents into the container at /app
-COPY . /app
-
-# Install any needed packages specified in requirements.txt
+WORKDIR /app/calendar
+COPY calendar /app/calendar
+WORKDIR /app/calendar
 RUN pip install --no-cache-dir -r requirements.txt
-
-# Make port 8000 available to the world outside this container
+# Expose port 8000 for the FastAPI server
 EXPOSE 8000
 
-# Define environment variable
-ENV PYTHONUNBUFFERED=1
+# Command to run the FastAPI server
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
 
-# Run uvicorn server
-CMD ["uvicorn", "your_module_name:app", "--host", "0.0.0.0", "--port", "8000"]
